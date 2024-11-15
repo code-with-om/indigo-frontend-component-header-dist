@@ -6,6 +6,7 @@ import HeaderLogo from "./header-logo";
 import accessibilityIcon from './assets/accessibilityIcon.png';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import $ from 'jquery';
 class Header extends Component {
   constructor(props) {
     super(props);
@@ -54,11 +55,14 @@ class Header extends Component {
       secure: false,
       sameSite: "Lax"
     });
+    console.log("LMS URL", process.env.LMS_BASE_URL);
     const jf = document.createElement('script');
     jf.src = `${process.env.LMS_BASE_URL}/static/js/toolkitjs/vebarl.js`;
+    // jf.src = `http://local.edly.io:8000/static/js/toolkitjs/vebarl.js`;
     jf.type = 'text/javascript';
     jf.id = 'external_js';
     jf.setAttribute("lms_base_url", process.env.LMS_BASE_URL + '/');
+    // jf.setAttribute("lms_base_url", 'http://local.edly.io:8000'+'/')
     const parentDiv = document.getElementById('nett-head');
     const localizeScript = document.createElement('script');
     localizeScript.src = "https://global.localizecdn.com/localize.js";
@@ -93,6 +97,7 @@ class Header extends Component {
     let selectTag = document.getElementById("langOptions");
     const lang_dict = [];
     axios.get(process.env.LMS_BASE_URL + `/mx-user-info/get_user_profile?email=${Cookies.get("email")}`).then(res => {
+      // axios.get(`http://local.edly.io:8000` + `/mx-user-info/get_user_profile?email=${Cookies.get("email")}`,).then((res) => {
       document.getElementById("header-username").innerText = res.data.username;
       document.getElementById("profileimageid").src = process.env.LMS_BASE_URL + res.data.profileImage.medium;
       document.getElementById("user-profiler-redirect").href = process.env.PROFILE_BASE_URL + res.data.username;
