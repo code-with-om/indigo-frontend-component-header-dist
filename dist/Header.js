@@ -6,6 +6,8 @@ import HeaderLogo from "./header-logo";
 import accessibilityIcon from './assets/accessibilityIcon.png';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { AppContext } from '@edx/frontend-platform/react';
+import { getConfig } from '@edx/frontend-platform';
 import $ from 'jquery';
 class Header extends Component {
   constructor(props) {
@@ -49,19 +51,22 @@ class Header extends Component {
   }
   componentDidMount() {
     var darkLang = [];
+    const {
+      authenticatedUser
+    } = this.context;
     var current_lang = Cookies.get('lang', {
       domain: process.env.SITE_DOMAIN,
       path: '/',
       secure: false,
       sameSite: "Lax"
     });
-    console.log("LMS URL", process.env.LMS_BASE_URL);
+    console.log("LMS current lang", current_lang);
     const jf = document.createElement('script');
-    jf.src = `${process.env.LMS_BASE_URL}/static/js/toolkitjs/vebarl.js`;
+    jf.src = `${getConfig().LMS_BASE_URL}/static/js/toolkitjs/vebarl.js`;
     // jf.src = `http://local.edly.io:8000/static/js/toolkitjs/vebarl.js`;
     jf.type = 'text/javascript';
     jf.id = 'external_js';
-    jf.setAttribute("lms_base_url", process.env.LMS_BASE_URL + '/');
+    jf.setAttribute("lms_base_url", getConfig().LMS_BASE_URL + '/');
     // jf.setAttribute("lms_base_url", 'http://local.edly.io:8000'+'/')
     const parentDiv = document.getElementById('nett-head');
     const localizeScript = document.createElement('script');
@@ -96,11 +101,13 @@ class Header extends Component {
     langSelect.addEventListener('click', this.handleLangOptionsClick);
     let selectTag = document.getElementById("langOptions");
     const lang_dict = [];
-    axios.get(process.env.LMS_BASE_URL + `/mx-user-info/get_user_profile?email=${Cookies.get("email")}`).then(res => {
-      // axios.get(`http://local.edly.io:8000` + `/mx-user-info/get_user_profile?email=${Cookies.get("email")}`,).then((res) => {
+
+    // axios.get(getConfig().LMS_BASE_URL + `/mx-user-info/get_user_profile?email=${Cookies.get("email")}`,).then((res) => {
+    axios.get(getConfig().LMS_BASE_URL + `/mx-user-info/get_user_profile?email=${authenticatedUser.email}`).then(res => {
       document.getElementById("header-username").innerText = res.data.username;
-      document.getElementById("profileimageid").src = process.env.LMS_BASE_URL + res.data.profileImage.medium;
-      document.getElementById("user-profiler-redirect").href = process.env.PROFILE_BASE_URL + res.data.username;
+      document.getElementById("profileimageid").src = getConfig().LMS_BASE_URL + res.data.profileImage.medium;
+      // document.getElementById("user-profiler-redirect").href = process.env.PROFILE_BASE_URL + res.data.username;
+      document.getElementById("user-profiler-redirect").href = getConfig().ACCOUNT_PROFILE_URL + '/u/' + res.data.username;
       const dashboardDiv = document.getElementById('dashboard-navbar');
       if (dashboardDiv && res.data.resume_block) {
         const newDiv = document.createElement('div');
@@ -242,7 +249,7 @@ class Header extends Component {
       className: "nav-item"
     }, /*#__PURE__*/React.createElement("a", {
       className: window.location.href.includes('dashboard/programs/') ? 'active tab-nav-link' : 'tab-nav-link',
-      href: process.env.LMS_BASE_URL + '/dashboard/programs/',
+      href: getConfig().LMS_BASE_URL + '/dashboard/programs/',
       accessKey: "s",
       "aria-current": "page"
     }, "Dashboard"))), /*#__PURE__*/React.createElement("div", {
@@ -315,7 +322,7 @@ class Header extends Component {
       className: "mobile-nav-item dropdown-item dropdown-nav-item",
       id: "dashboard-navbar"
     }, /*#__PURE__*/React.createElement("a", {
-      href: process.env.LMS_BASE_URL + 'dashboard/programs/',
+      href: getConfig().LMS_BASE_URL + 'dashboard/programs/',
       role: "menuitem"
     }, "Dashboard")), /*#__PURE__*/React.createElement("div", {
       className: "mobile-nav-item dropdown-item dropdown-nav-item"
@@ -326,15 +333,16 @@ class Header extends Component {
     }, "Profile")), /*#__PURE__*/React.createElement("div", {
       className: "mobile-nav-item dropdown-item dropdown-nav-item"
     }, /*#__PURE__*/React.createElement("a", {
-      href: process.env.LMS_BASE_URL + '/account/settings',
+      href: getConfig().ACCOUNT_SETTINGS_URL,
       role: "menuitem"
     }, "Account")), /*#__PURE__*/React.createElement("div", {
       className: "mobile-nav-item dropdown-item dropdown-nav-item"
     }, /*#__PURE__*/React.createElement("a", {
-      href: process.env.LMS_BASE_URL + '/logout',
+      href: getConfig().LOGOUT_URL,
       role: "menuitem"
     }, "Sign Out")))))))));
   }
 }
+_defineProperty(Header, "contextType", AppContext);
 export default Header;
 //# sourceMappingURL=Header.js.map
