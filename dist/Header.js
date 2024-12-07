@@ -63,11 +63,9 @@ class Header extends Component {
     console.log("LMS current lang", current_lang);
     const jf = document.createElement('script');
     jf.src = `${getConfig().LMS_BASE_URL}/static/js/toolkitjs/vebarl.js`;
-    // jf.src = `http://local.edly.io:8000/static/js/toolkitjs/vebarl.js`;
     jf.type = 'text/javascript';
     jf.id = 'external_js';
     jf.setAttribute("lms_base_url", getConfig().LMS_BASE_URL + '/');
-    // jf.setAttribute("lms_base_url", 'http://local.edly.io:8000'+'/')
     const parentDiv = document.getElementById('nett-head');
     const localizeScript = document.createElement('script');
     localizeScript.src = "https://global.localizecdn.com/localize.js";
@@ -101,87 +99,97 @@ class Header extends Component {
     langSelect.addEventListener('click', this.handleLangOptionsClick);
     let selectTag = document.getElementById("langOptions");
     const lang_dict = [];
-
-    // axios.get(getConfig().LMS_BASE_URL + `/mx-user-info/get_user_profile?email=${Cookies.get("email")}`,).then((res) => {
-    axios.get(getConfig().LMS_BASE_URL + `/mx-user-info/get_user_profile?email=${authenticatedUser.email}`).then(res => {
-      document.getElementById("header-username").innerText = res.data.username;
-      document.getElementById("profileimageid").src = getConfig().LMS_BASE_URL + res.data.profileImage.medium;
-      // document.getElementById("user-profiler-redirect").href = process.env.PROFILE_BASE_URL + res.data.username;
-      document.getElementById("user-profiler-redirect").href = getConfig().ACCOUNT_PROFILE_URL + '/u/' + res.data.username;
-      const dashboardDiv = document.getElementById('dashboard-navbar');
-      if (dashboardDiv && res.data.resume_block) {
-        const newDiv = document.createElement('div');
-        newDiv.className = 'mobile-nav-item dropdown-item dropdown-nav-item';
-        newDiv.innerHTML = `<a href=${res.data.resume_block} role="menuitem">Resume your last course</a>`;
-        dashboardDiv.parentNode.insertBefore(newDiv, dashboardDiv);
-      }
-      ;
-      for (let i = 0; i < res.data.dark_languages.length; i++) {
-        var code = res.data.dark_languages[i][0];
-        var name = res.data.dark_languages[i][1];
-        if (code != 'en') {
-          if (code == "hi-IN" || code == "hi") {
-            name = name + "(Hindi)";
-          } else if (code == "kn") {
-            name = name + "(Kannada)";
-          } else if (code == "bn") {
-            name = name + "(Bangali)";
-          } else if (code == "en") {
-            name = name + "(English)";
-          } else if (code == "ta-IN") {
-            name = name + "(Tamil (India))";
-          } else if (code == "or") {
-            name = name + "(Odia)";
-          } else if (code == "ml-IN" || code == "ml") {
-            name = name + "(Malayalam)";
-          }
-          darkLang.push(code);
-          lang_dict.push({
-            "name": name,
-            "code": code
-          });
-        }
-      }
-      this.setState({
-        languages: lang_dict
+    localizeScript.onload = () => {
+      Localize.initialize({
+        key: 'zKxxnKn5hZxwu',
+        rememberLanguage: true
       });
-      this.state.languages.map((lang, i) => {
-        var option = new Option(lang.name, lang.code);
-        selectTag.append(option);
-      });
-      const options = selectTag.options;
-      for (let i = 0; i < options.length; i++) {
-        if (current_lang == options[i].value) {
-          options[i].setAttribute("selected", true);
+      Localize.getAvailableLanguages((error, data) => {
+        if (error) {
+          console.error('Error fetching available languages:', error);
         } else {
-          options[i].removeAttribute("selected", true);
+          data.map((e, i) => {
+            var lang_name = e.name;
+            if (e.code == "hi-IN" || e.code == "hi") {
+              lang_name = e.name + "(Hindi)";
+            } else if (e.code == "kn") {
+              lang_name = e.name + "(Kannada)";
+            } else if (e.code == "bn") {
+              lang_name = e.name + "(Bangali)";
+            } else if (e.code == "en") {
+              lang_name = e.name + "(English)";
+            } else if (e.code == "ta-IN") {
+              lang_name = e.name + "(Tamil (India))";
+            } else if (e.code == "or") {
+              lang_name = e.name + "(Odia)";
+            } else if (e.code == "ml-IN" || e.code == "ml") {
+              lang_name = e.name + "(Malayalam)";
+            }
+            lang_dict.push({
+              "name": e.name,
+              "code": e.code
+            });
+
+            // console.log("mx language option", lang_dict)
+          });
+          console.log('Available languages:', data);
         }
-      }
-    });
-    Localize.getAvailableLanguages((error, data) => {
-      data.map((e, i) => {
-        var lang_name = e.name;
-        if (e.code == "hi-IN" || e.code == "hi") {
-          lang_name = e.name + "(Hindi)";
-        } else if (e.code == "kn") {
-          lang_name = e.name + "(Kannada)";
-        } else if (e.code == "bn") {
-          lang_name = e.name + "(Bangali)";
-        } else if (e.code == "en") {
-          lang_name = e.name + "(English)";
-        } else if (e.code == "ta-IN") {
-          lang_name = e.name + "(Tamil (India))";
-        } else if (e.code == "or") {
-          lang_name = e.name + "(Odia)";
-        } else if (e.code == "ml-IN" || e.code == "ml") {
-          lang_name = e.name + "(Malayalam)";
-        }
-        lang_dict.push({
-          "name": e.name,
-          "code": e.code
-        });
       });
-    });
+      axios.get(getConfig().LMS_BASE_URL + `/mx-user-info/get_user_profile?email=${authenticatedUser.email}`).then(res => {
+        document.getElementById("header-username").innerText = res.data.username;
+        document.getElementById("profileimageid").src = getConfig().LMS_BASE_URL + res.data.profileImage.medium;
+        document.getElementById("user-profiler-redirect").href = getConfig().ACCOUNT_PROFILE_URL + '/u/' + res.data.username;
+        const dashboardDiv = document.getElementById('dashboard-navbar');
+        if (dashboardDiv && res.data.resume_block) {
+          const newDiv = document.createElement('div');
+          newDiv.className = 'mobile-nav-item dropdown-item dropdown-nav-item';
+          newDiv.innerHTML = `<a href=${res.data.resume_block} role="menuitem">Resume your last course</a>`;
+          dashboardDiv.parentNode.insertBefore(newDiv, dashboardDiv);
+        }
+        ;
+        for (let i = 0; i < res.data.dark_languages.length; i++) {
+          var code = res.data.dark_languages[i][0];
+          var name = res.data.dark_languages[i][1];
+          if (code != 'en') {
+            if (code == "hi-IN" || code == "hi") {
+              name = name + "(Hindi)";
+            } else if (code == "kn") {
+              name = name + "(Kannada)";
+            } else if (code == "bn") {
+              name = name + "(Bangali)";
+            } else if (code == "en") {
+              name = name + "(English)";
+            } else if (code == "ta-IN") {
+              name = name + "(Tamil (India))";
+            } else if (code == "or") {
+              name = name + "(Odia)";
+            } else if (code == "ml-IN" || code == "ml") {
+              name = name + "(Malayalam)";
+            }
+            darkLang.push(code);
+            lang_dict.push({
+              "name": name,
+              "code": code
+            });
+          }
+        }
+        this.setState({
+          languages: lang_dict
+        });
+        this.state.languages.map((lang, i) => {
+          var option = new Option(lang.name, lang.code);
+          selectTag.append(option);
+        });
+        const options = selectTag.options;
+        for (let i = 0; i < options.length; i++) {
+          if (current_lang == options[i].value) {
+            options[i].setAttribute("selected", true);
+          } else {
+            options[i].removeAttribute("selected", true);
+          }
+        }
+      });
+    };
     this.setState({
       darkLanguages: darkLang
     });
