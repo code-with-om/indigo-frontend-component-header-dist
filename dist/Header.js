@@ -8,6 +8,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { AppContext } from '@edx/frontend-platform/react';
 import { getConfig } from '@edx/frontend-platform';
+import CaretDropDownIcon from './Icons';
 import $ from 'jquery';
 class Header extends Component {
   constructor(props) {
@@ -317,10 +318,7 @@ class Header extends Component {
       "aria-expanded": "false",
       tabIndex: -1,
       "aria-controls": "user-menu"
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "fa fa-caret-down",
-      "aria-hidden": "true"
-    })), /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement(CaretDropDownIcon, null)), /*#__PURE__*/React.createElement("div", {
       className: "dropdown-user-menu hidden",
       "aria-label": "More Options",
       role: "menu",
