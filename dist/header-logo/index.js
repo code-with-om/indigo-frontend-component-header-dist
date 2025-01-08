@@ -5,7 +5,7 @@ const HeaderLogo = () => {
   return /*#__PURE__*/React.createElement("span", {
     className: "header-logo"
   }, /*#__PURE__*/React.createElement("a", {
-    href: getConfig().LMS_BASE_URL + 'dashboard/programs/',
+    href: getConfig().LMS_BASE_URL + '/dashboard/programs/',
     style: {
       margin: "7px"
     }

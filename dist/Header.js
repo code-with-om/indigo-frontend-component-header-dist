@@ -15,7 +15,22 @@ class Header extends Component {
     super(props);
     _defineProperty(this, "handleLangOptionsClick", e => {
       let current_url = window.location.href;
-      let flag = true;
+      let base_url = window.location.origin;
+      let text = "Do you want to change the language? You will be redirected to the 'explore courses' page";
+      if (current_url.includes('explore-courses/program-courses') || current_url.includes('explore-courses/#main') || current_url === `${base_url}/explore-courses/` || current_url === `${base_url}/explore-courses` || current_url.includes('explore-courses/search')) {
+        this.chngLang(e);
+      } else {
+        if (confirm(text) == true) {
+          this.chngLang(e);
+        } else {
+          let prev_lang = localStorage.getItem("lang");
+          $('.myLang').val(prev_lang);
+          return false;
+        }
+      }
+    });
+    _defineProperty(this, "chngLang", e => {
+      let current_url = window.location.href;
       var setLang = e.target.value;
       localStorage.setItem("langButtonClicked", true);
       localStorage.setItem("lang", e.target.value);
@@ -25,13 +40,25 @@ class Header extends Component {
         secure: false,
         sameSite: "Lax"
       });
-      var all_darkLangs_dict = this.state.darkLanguages;
-      if (all_darkLangs_dict.includes(setLang) && setLang != 'en') {
-        if (current_url.includes('/explore-courses/explore-programs') || current_url.includes('/explore-courses/explore-topics/') || current_url.includes('/courses/course-')) window.location.href = window.location.origin + '/explore-courses/#main';else window.location.reload();
-      }
-      if (!all_darkLangs_dict.includes(setLang) || setLang == 'en') {
+      if (current_url.includes('/explore-courses/explore-programs') || current_url.includes('/explore-courses/explore-topics/')) {
+        window.location.href = window.location.origin + '/explore-courses/#main';
+      } else {
         window.location.reload();
       }
+
+      // if (all_darkLangs_dict.includes(setLang) && setLang != 'en') {
+      //   if (current_url.includes('/explore-courses/explore-programs') || current_url.includes('/explore-courses/explore-topics/') || current_url.includes('/courses/course-'))
+
+      //     window.location.href = window.location.origin + '/explore-courses/#main';
+      //   else
+      //     window.location.reload()
+
+      // }
+
+      // if ((!(all_darkLangs_dict.includes(setLang)) || setLang == 'en')) {
+      //   window.location.reload()
+      // }
+
       Localize.setLanguage(setLang);
       $('#langOptions > option').each(function () {
         if (setLang == $(this).val()) {
@@ -44,10 +71,20 @@ class Header extends Component {
         Localize.untranslate($(".myLang").get(0));
       }, 100);
     });
+    //Search
+    _defineProperty(this, "handleSearchClick", e => {
+      e.preventDefault();
+      let searchData = $('.enter').val();
+      if (searchData != "") {
+        let url = process.env.EXPLORE_COURSE_URL + `/explore-courses/search?text=${searchData}`;
+        window.location = url;
+      }
+    });
     this.state = {
       darkLanguages: [],
       languages: [],
-      lang_key: ''
+      lang_key: '',
+      setText: ''
     };
   }
   componentDidMount() {
@@ -55,6 +92,15 @@ class Header extends Component {
     const {
       authenticatedUser
     } = this.context;
+    if (!authenticatedUser || !authenticatedUser.email) {
+      const loginUrl = getConfig().LOGIN_URL;
+      window.location.href = loginUrl;
+      return; // Stop further execution
+    }
+    const search_query = new URLSearchParams(location.search).get("text");
+    this.setState({
+      setText: search_query || ''
+    }); // Fallback to an empty string
     var current_lang = Cookies.get('lang', {
       domain: process.env.SITE_DOMAIN,
       path: '/',
@@ -127,7 +173,7 @@ class Header extends Component {
               lang_name = e.name + "(Malayalam)";
             }
             lang_dict.push({
-              "name": e.name,
+              "name": lang_name,
               "code": e.code
             });
 
@@ -201,6 +247,12 @@ class Header extends Component {
         $(this).removeAttr("selected");
       }
     });
+
+    // Hide languages Dropdown on course page 
+    let current_url = window.location.href;
+    if (current_url.includes('learning/course/')) {
+      $(".myLang").hide();
+    }
   }
   render() {
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
@@ -265,19 +317,22 @@ class Header extends Component {
       className: "search_box"
     }, /*#__PURE__*/React.createElement("form", {
       className: "headerSearchForm",
-      onSubmit: e => {
-        e.preventDefault();
-      }
+      onSubmit: this.handleSearchClick
     }, /*#__PURE__*/React.createElement("div", {
       className: "form-group",
       role: "search"
     }, /*#__PURE__*/React.createElement("input", {
       type: "text",
       id: "heardeSearch",
+      value: this.state.setText,
+      onChange: e => {
+        this.setState({
+          setText: e.target.value
+        }); // Update state correctly
+      },
       name: "Search for topic of interest",
       placeholder: "Search for topic of interest",
-      className: "enter",
-      onChange: e => {}
+      className: "enter"
     }), /*#__PURE__*/React.createElement("input", {
       type: "submit",
       value: "",
@@ -328,7 +383,7 @@ class Header extends Component {
       className: "mobile-nav-item dropdown-item dropdown-nav-item",
       id: "dashboard-navbar"
     }, /*#__PURE__*/React.createElement("a", {
-      href: getConfig().LMS_BASE_URL + 'dashboard/programs/',
+      href: getConfig().LMS_BASE_URL + '/dashboard/programs/',
       role: "menuitem"
     }, "Dashboard")), /*#__PURE__*/React.createElement("div", {
       className: "mobile-nav-item dropdown-item dropdown-nav-item"
