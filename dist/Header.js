@@ -14,6 +14,20 @@ class Header extends Component {
   constructor(props) {
     super(props);
     _defineProperty(this, "handleLangOptionsClick", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const selectedLang = e.target.value; // Get the selected language code
+      const currentLang = Cookies.get('lang', {
+        domain: process.env.SITE_DOMAIN,
+        path: '/',
+        secure: false,
+        sameSite: "Lax"
+      });
+
+      // If the selected language is the same as the current language, do nothing
+      if (selectedLang === currentLang) {
+        return;
+      }
       let current_url = window.location.href;
       let base_url = window.location.origin;
       let text = "Do you want to change the language? You will be redirected to the 'explore courses' page";
@@ -23,8 +37,10 @@ class Header extends Component {
         if (confirm(text) == true) {
           this.chngLang(e);
         } else {
-          let prev_lang = localStorage.getItem("lang");
-          $('.myLang').val(prev_lang);
+          // let prev_lang = localStorage.getItem("lang");
+          // $('.myLang').val(prev_lang)
+          const langSelect = document.getElementById('langOptions');
+          langSelect.value = currentLang;
           return false;
         }
       }
@@ -110,6 +126,8 @@ class Header extends Component {
     console.log("LMS current lang", current_lang);
     const jf = document.createElement('script');
     jf.src = `${getConfig().LMS_BASE_URL}/static/js/toolkitjs/vebarl.js`;
+    // jf.src = `${getConfig().LMS_BASE_URL}/static/js/toolkitjs/headertoolkit.js`;
+
     jf.type = 'text/javascript';
     jf.id = 'external_js';
     jf.setAttribute("lms_base_url", getConfig().LMS_BASE_URL + '/');
@@ -143,7 +161,8 @@ class Header extends Component {
     parentDiv.append(langSelect);
     const bodyDiv = document.body;
     bodyDiv.append(localizeScript);
-    langSelect.addEventListener('click', this.handleLangOptionsClick);
+    // langSelect.addEventListener('click', this.handleLangOptionsClick);
+    langSelect.addEventListener('change', this.handleLangOptionsClick);
     let selectTag = document.getElementById("langOptions");
     const lang_dict = [];
     localizeScript.onload = () => {
