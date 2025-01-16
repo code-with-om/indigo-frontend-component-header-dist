@@ -123,10 +123,31 @@ class Header extends Component {
       secure: false,
       sameSite: "Lax"
     });
-    console.log("LMS current lang", current_lang);
     const jf = document.createElement('script');
-    // jf.src = `${getConfig().LMS_BASE_URL}/static/js/toolkitjs/vebarl.js`;
-
+    const script = document.createElement('script');
+    script.id = 'oada_ma_toolbar_script';
+    script.async = true;
+    script.type = 'text/javascript';
+    script.setAttribute('crossorigin', 'anonymous');
+    // Define the license key and URL
+    const oadaLicenseKey = getConfig().MAX_TOOLBAR_KEY;
+    const oadaLicenseUrl = "https://api.maxaccess.io/scripts/toolbar/";
+    // Create the inline script content
+    script.innerHTML = `
+      var oada_ma_license_key="${oadaLicenseKey}";
+      var oada_ma_license_url="${oadaLicenseUrl}";
+      (function(s,o,g){
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.src=g;
+        a.setAttribute("async","");
+        a.setAttribute("type","text/javascript");
+        a.setAttribute("crossorigin","anonymous");
+        m.parentNode.insertBefore(a,m);
+      })(document,"script",oada_ma_license_url+oada_ma_license_key);
+    `;
+    // Append the script to the body
+    document.body.appendChild(script);
     jf.type = 'text/javascript';
     jf.id = 'external_js';
     jf.setAttribute("lms_base_url", getConfig().LMS_BASE_URL + '/');
@@ -194,8 +215,6 @@ class Header extends Component {
               "name": lang_name,
               "code": e.code
             });
-
-            // console.log("mx language option", lang_dict)
           });
           console.log('Available languages:', data);
         }
@@ -273,19 +292,7 @@ class Header extends Component {
     }
   }
   render() {
-    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-      className: "uai userway_dark",
-      id: "userwayAccessibilityIcon",
-      "aria-label": "accessibility menu",
-      role: "button",
-      tabIndex: 1
-    }, /*#__PURE__*/React.createElement("img", {
-      alt: "Accessibility Widget",
-      src: accessibilityIcon,
-      className: "ui_w",
-      width: "35",
-      height: "35"
-    })), /*#__PURE__*/React.createElement("header", {
+    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("header", {
       className: "global-header",
       id: "nett-head"
     }, /*#__PURE__*/React.createElement("div", {
