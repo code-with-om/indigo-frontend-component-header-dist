@@ -125,28 +125,10 @@ class Header extends Component {
     });
     const jf = document.createElement('script');
     const script = document.createElement('script');
-    script.id = 'oada_ma_toolbar_script';
+    const user_way_key = getConfig().USER_WAY_KEY;
+    script.src = 'https://cdn.userway.org/widget.js';
+    script.setAttribute('data-account', user_way_key);
     script.async = true;
-    script.type = 'text/javascript';
-    script.setAttribute('crossorigin', 'anonymous');
-    // Define the license key and URL
-    const oadaLicenseKey = getConfig().MAX_TOOLBAR_KEY;
-    const oadaLicenseUrl = "https://api.maxaccess.io/scripts/toolbar/";
-    // Create the inline script content
-    script.innerHTML = `
-      var oada_ma_license_key="${oadaLicenseKey}";
-      var oada_ma_license_url="${oadaLicenseUrl}";
-      (function(s,o,g){
-        a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];
-        a.src=g;
-        a.setAttribute("async","");
-        a.setAttribute("type","text/javascript");
-        a.setAttribute("crossorigin","anonymous");
-        m.parentNode.insertBefore(a,m);
-      })(document,"script",oada_ma_license_url+oada_ma_license_key);
-    `;
-    // Append the script to the body
     document.body.appendChild(script);
     jf.type = 'text/javascript';
     jf.id = 'external_js';
@@ -181,7 +163,6 @@ class Header extends Component {
     parentDiv.append(langSelect);
     const bodyDiv = document.body;
     bodyDiv.append(localizeScript);
-    // langSelect.addEventListener('click', this.handleLangOptionsClick);
     langSelect.addEventListener('change', this.handleLangOptionsClick);
     let selectTag = document.getElementById("langOptions");
     const lang_dict = [];
@@ -249,6 +230,8 @@ class Header extends Component {
               name = name + "(Odia)";
             } else if (code == "ml-IN" || code == "ml") {
               name = name + "(Malayalam)";
+            } else if (code == "gu") {
+              name = name + "(Gujrati)";
             }
             darkLang.push(code);
             lang_dict.push({
