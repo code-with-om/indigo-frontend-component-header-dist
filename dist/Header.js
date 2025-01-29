@@ -272,6 +272,14 @@ class Header extends Component {
     let current_url = window.location.href;
     if (current_url.includes('learning/course/')) {
       $(".myLang").hide();
+
+      //  LTS WAT Code START : DO NOT REMOVE or MODIFY 
+      //  Create and append the LTS script
+      const ltsScript = document.createElement('script');
+      ltsScript.src = `https://lts.lb.gcloud.letstalksign.org/script/lts-load-lms-V1-OB.js?auth_api=${getConfig().LMS_BASE_URL}/letstalksign/authenticate`;
+      ltsScript.async = true;
+      document.body.appendChild(ltsScript);
+      //  LTS WAT Code END : DO NOT REMOVE or MODIFY 
     }
   }
   render() {
