@@ -340,7 +340,7 @@ class Header extends Component {
       accessKey: "s",
       "aria-current": "page"
     }, "Dashboard"))), /*#__PURE__*/React.createElement("div", {
-      className: "search_box"
+      className: "search_box1"
     }, /*#__PURE__*/React.createElement("form", {
       className: "headerSearchForm",
       onSubmit: this.handleSearchClick
