@@ -33,19 +33,7 @@ class Header extends Component {
       let text = "Do you want to change the language? You will be redirected to the 'explore courses' page";
       if (current_url.includes('explore-courses/program-courses') || current_url.includes('explore-courses/#main') || current_url === `${base_url}/explore-courses/` || current_url === `${base_url}/explore-courses` || current_url.includes('explore-courses/search')) {
         this.chngLang(e);
-      }
-
-      // else {
-      //     if (confirm(text) == true) {
-      //         this.chngLang(e);
-      //     } 
-      //     else {
-      //         const langSelect = document.getElementById('langOptions');
-      //         langSelect.value = currentLang;
-      //         return false
-      //     }
-      // }
-      else {
+      } else {
         // Use a custom confirmation dialog
         this.showCustomConfirmDialog(text, () => {
           this.chngLang(e);
@@ -55,6 +43,7 @@ class Header extends Component {
         });
       }
     });
+    // Custom confirmation dialog
     // Custom confirmation dialog
     _defineProperty(this, "showCustomConfirmDialog", (message, onConfirm, onCancel) => {
       // Create dialog elements
@@ -84,6 +73,16 @@ class Header extends Component {
       const confirmButton = document.createElement('button');
       confirmButton.textContent = 'Confirm';
       confirmButton.style.margin = '0 10px';
+      var modalNodes = Array.from(document.querySelectorAll('#customConfirmModal *'));
+      var nonModalNodes = document.querySelectorAll('body *:not(#customConfirmModal):not([tabindex="-1"])');
+      for (var i = 0; i < nonModalNodes.length; i++) {
+        var node = nonModalNodes[i];
+        if (!modalNodes.includes(node)) {
+          node._prevTabindex = node.getAttribute('tabindex');
+          node.setAttribute('tabindex', -1);
+          node.style.outline = 'none';
+        }
+      }
       confirmButton.onclick = () => {
         document.body.removeChild(modal);
         onConfirm();
@@ -94,6 +93,17 @@ class Header extends Component {
       cancelButton.onclick = () => {
         document.body.removeChild(modal);
         onCancel();
+        document.body.style.overflow = null;
+        for (var i = 0; i < nonModalNodes.length; i++) {
+          var node = nonModalNodes[i];
+          if (node._prevTabindex) {
+            node.setAttribute('tabindex', node._prevTabindex);
+            node._prevTabindex = null;
+          } else {
+            node.removeAttribute('tabindex');
+          }
+          node.style.outline = null;
+        }
       };
 
       // Append elements
@@ -105,6 +115,25 @@ class Header extends Component {
 
       // Focus on the message element
       messageElem.focus();
+
+      // Close modal on outside click
+      modal.addEventListener('click', event => {
+        if (event.target === modal) {
+          document.body.removeChild(modal);
+          onCancel();
+          document.body.style.overflow = null;
+          for (var i = 0; i < nonModalNodes.length; i++) {
+            var node = nonModalNodes[i];
+            if (node._prevTabindex) {
+              node.setAttribute('tabindex', node._prevTabindex);
+              node._prevTabindex = null;
+            } else {
+              node.removeAttribute('tabindex');
+            }
+            node.style.outline = null;
+          }
+        }
+      });
     });
     _defineProperty(this, "chngLang", e => {
       let current_url = window.location.href;
