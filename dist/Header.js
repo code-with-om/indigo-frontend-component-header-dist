@@ -220,6 +220,7 @@ class Header extends Component {
     const jf = document.createElement('script');
     const mx_localizekey = getConfig().MX_LOCALIZEKEY;
     const show_user_way = getConfig().SHOW_USER_WAY;
+    console.log("show userway", show_user_way);
     if (show_user_way == "True") {
       const script = document.createElement('script');
       const user_way_key = getConfig().USER_WAY_KEY;
