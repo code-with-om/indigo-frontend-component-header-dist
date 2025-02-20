@@ -18,7 +18,7 @@ class Header extends Component {
       e.stopPropagation();
       const selectedLang = e.target.value; // Get the selected language code
       const currentLang = Cookies.get('lang', {
-        domain: process.env.SITE_DOMAIN,
+        domain: getConfig().SITE_DOMAIN[0],
         path: '/',
         secure: false,
         sameSite: "Lax"
@@ -141,7 +141,7 @@ class Header extends Component {
       localStorage.setItem("langButtonClicked", true);
       localStorage.setItem("lang", e.target.value);
       Cookies.set('lang', setLang, {
-        domain: process.env.SITE_DOMAIN,
+        domain: getConfig().SITE_DOMAIN[0],
         path: '/',
         secure: false,
         sameSite: "Lax"
@@ -182,7 +182,7 @@ class Header extends Component {
       e.preventDefault();
       let searchData = $('.enter').val();
       if (searchData != "") {
-        let url = process.env.EXPLORE_COURSE_URL + `/search?text=${searchData}`;
+        let url = getConfig().EXPLORE_COURSE_URL[0] + `/search?text=${searchData}`;
         window.location = url;
       }
     });
@@ -203,12 +203,13 @@ class Header extends Component {
       window.location.href = loginUrl;
       return; // Stop further execution
     }
+    console.log("site domain", getConfig().SITE_DOMAIN, getConfig().EXPLORE_COURSE_URL);
     const search_query = new URLSearchParams(location.search).get("text");
     this.setState({
       setText: search_query || ''
     }); // Fallback to an empty string
     var current_lang = Cookies.get('lang', {
-      domain: process.env.SITE_DOMAIN,
+      domain: getConfig().SITE_DOMAIN[0],
       path: '/',
       secure: false,
       sameSite: "Lax"
@@ -220,7 +221,6 @@ class Header extends Component {
     const jf = document.createElement('script');
     const mx_localizekey = getConfig().MX_LOCALIZEKEY;
     const show_user_way = getConfig().SHOW_USER_WAY;
-    console.log("show userway", show_user_way);
     if (show_user_way == "True") {
       const script = document.createElement('script');
       const user_way_key = getConfig().USER_WAY_KEY;
@@ -352,7 +352,7 @@ class Header extends Component {
             options[i].setAttribute("selected", true);
             Localize.setLanguage(current_lang);
             Cookies.set('lang', current_lang, {
-              domain: process.env.SITE_DOMAIN,
+              domain: getConfig().SITE_DOMAIN[0],
               path: '/',
               secure: false,
               sameSite: "Lax"
